@@ -2,7 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/group_categories"
+        android:checkableBehavior="single"
+        android:orderInCategory="1">
         <item
             android:id="@+id/nav_category1"
             android:icon="@drawable/ic_category"
@@ -17,7 +20,10 @@
             android:title="Kategorie 3" />
     </group>
 
-    <item android:title="Kategorieverwaltung">
+    <item
+        android:id="@+id/group_administration"
+        android:title="Kategorieverwaltung"
+        android:orderInCategory="3">
         <menu>
             <item
                 android:id="@+id/nav_category_new"

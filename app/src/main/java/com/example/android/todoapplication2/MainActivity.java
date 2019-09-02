@@ -12,13 +12,20 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NewListElementDialog.NewListElementDialogListener {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NewListElementDialog.NewListElementDialogListener, NewCategoryDialog.NewCategoryDialogListener {
 
     private DrawerLayout drawer;
+    private ArrayList<Category1Fragment> allCategories = new ArrayList<>();
+    private NavigationView navView;
+    private Menu menu;
+    private String categoryName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+
     }
 
     @Override
@@ -88,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportActionBar().setTitle("Kategorie 3");
                 break;
             case R.id.nav_category_new:
-                Toast.makeText(this, "Neue Kategorie", Toast.LENGTH_SHORT).show();
+                openNewCategoryDialog();
                 break;
             case R.id.nav_category_edit:
                 Toast.makeText(this, "Kategorie bearbeiten", Toast.LENGTH_SHORT).show();
@@ -108,10 +116,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void openNewCategoryDialog(){
+        NewCategoryDialog newCategoryDialog = new NewCategoryDialog();
+        newCategoryDialog.show(getSupportFragmentManager(), "new category dialog");
+    }
+
     private void openNewListElementDialog(){
-        //Creating instance of ProduktDialog and show it
         NewListElementDialog newListElementDialog = new NewListElementDialog();
         newListElementDialog.show(getSupportFragmentManager(), "new list element dialog");
+    }
+
+    @Override
+    public void addNewCategory(String newCategoryName){
+        navView = (NavigationView) findViewById(R.id.nav_view);
+        menu = navView.getMenu();
+        menu.add(R.id.group_categories, Menu.NONE, 1, newCategoryName).setIcon(R.drawable.ic_category);
     }
 
     @Override

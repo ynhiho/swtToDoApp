@@ -21,9 +21,9 @@ public class Liste1Fragment extends Fragment {
         rootView = inflater.inflate(R.layout.list_elements_view, container, false);
 
         allListElements = new ArrayList<ListElement>();
-        allListElements.add(new ListElement("tft spielen"));
-        allListElements.add(new ListElement("wow spielen"));
-        allListElements.add(new ListElement("eis essen"));
+        allListElements.add(new ListElement("schlafen"));
+        allListElements.add(new ListElement("essen"));
+        allListElements.add(new ListElement("spielen"));
 
         displayAllListElements();
 
