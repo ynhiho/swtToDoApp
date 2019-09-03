@@ -25,10 +25,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private DrawerLayout drawer;
     private ArrayList<Category1Fragment> allCategories = new ArrayList<>();
-    private Category1Fragment currentCategory;
+    private Category1Fragment mainFragment;
     private NavigationView navView;
     private Menu menu;
     private SimpleFragmentPagerAdapter adapter;
+
+    private String currentCategoryName;
+
+    public String GetCurrentCategory() { return currentCategoryName; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,15 +86,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
-
-
     }
 
     private void initializeDefaultCategory(){
         Category1Fragment newCategory = new Category1Fragment();
         newCategory.setName("SWT");
         allCategories.add(newCategory);
-        currentCategory = newCategory;
+        mainFragment = newCategory;
 
     }
 
@@ -125,28 +127,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Kategorie bearbeiten", Toast.LENGTH_SHORT).show();
                 break;
             default:
-                currentCategory = giveSelectedCategory(item);
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        currentCategory).commit();
-                getSupportActionBar().setTitle(currentCategory.getName());
-                Log.i("MainActivity", "Selected Category: " + currentCategory.getName());
-
+                currentCategoryName = item.getTitle().toString();
+                getSupportActionBar().setTitle(currentCategoryName);
+                populateListView();
+                populateListElements();
+                Log.i("MainActivity", "Selected Category: " + item.getTitle());
         }
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private Category1Fragment giveSelectedCategory(MenuItem item){
-        Category1Fragment selectedCategory;
-        for (Category1Fragment cat : allCategories){
-            if(cat.getName().equals(item.getTitle().toString())){
-                selectedCategory = cat;
-                return selectedCategory;
-            }
-        }
-        return null;
-    }
+    private void populateListView() {}
+    private void populateListElements() {}
 
     @Override
     public void onBackPressed() {
