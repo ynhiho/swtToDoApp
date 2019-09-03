@@ -20,6 +20,8 @@ import java.util.ArrayList;
 public class Category1Fragment extends Fragment {
 
     View rootView;
+    private String name;
+    private ArrayList<Liste1Fragment> allLists = new ArrayList<>();
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_category1, container, false);
@@ -30,4 +32,15 @@ public class Category1Fragment extends Fragment {
         return rootView;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void addList (Liste1Fragment newList){
+        allLists.add(newList);
+    }
 }

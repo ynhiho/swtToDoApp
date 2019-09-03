@@ -9,15 +9,7 @@
         <item
             android:id="@+id/nav_category1"
             android:icon="@drawable/ic_category"
-            android:title="Kategorie 1" />
-        <item
-            android:id="@+id/nav_category2"
-            android:icon="@drawable/ic_category"
-            android:title="Kategorie 2" />
-        <item
-            android:id="@+id/nav_category3"
-            android:icon="@drawable/ic_category"
-            android:title="Kategorie 3" />
+            android:title="SWT" />
     </group>
 
     <item

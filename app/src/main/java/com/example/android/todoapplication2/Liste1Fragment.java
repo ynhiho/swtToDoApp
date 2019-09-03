@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class Liste1Fragment extends Fragment {
 
     View rootView;
+    private String name;
     ArrayList<ListElement> allListElements;
 
     @Nullable
