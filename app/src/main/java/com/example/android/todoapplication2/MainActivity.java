@@ -19,16 +19,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NewListElementDialog.NewListElementDialogListener, NewCategoryDialog.NewCategoryDialogListener, NewListDialog.NewListDialogListener{
 
     private DrawerLayout drawer;
-    private ArrayList<Category1Fragment> allCategories = new ArrayList<>();
-    private Category1Fragment mainFragment;
+    private Category1Fragment categoryFragment;
     private NavigationView navView;
     private Menu menu;
     private SimpleFragmentPagerAdapter adapter;
+
+    private ArrayList<String> allCategoriesName = new ArrayList<>();
+    ArrayList<ArrayList<String>> datenbank = new ArrayList<>();
 
     private String currentCategoryName;
 
@@ -71,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+        /* Tab Layout */
+
         // Find the view pager that will allow the user to swipe between fragments
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 
@@ -86,14 +91,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+
+
+
     }
 
     private void initializeDefaultCategory(){
-        Category1Fragment newCategory = new Category1Fragment();
-        newCategory.setName("SWT");
-        allCategories.add(newCategory);
-        mainFragment = newCategory;
-
+        allCategoriesName.add("SWT");
+        currentCategoryName = "SWT";
+        datenbank.add(new ArrayList());
     }
 
     @Override
@@ -129,6 +136,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             default:
                 currentCategoryName = item.getTitle().toString();
                 getSupportActionBar().setTitle(currentCategoryName);
+
+                datenbank.add(new ArrayList<String>());
+
                 populateListView();
                 populateListElements();
                 Log.i("MainActivity", "Selected Category: " + item.getTitle());
@@ -162,10 +172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addNewCategory(String newCategoryName) {
-
-        Category1Fragment newCategory = new Category1Fragment();
-        newCategory.setName(newCategoryName);
-        allCategories.add(newCategory);
+        allCategoriesName.add(newCategoryName);
 
         navView = (NavigationView) findViewById(R.id.nav_view);
         menu = navView.getMenu();
@@ -180,6 +187,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void addNewList(String newListName) {
         adapter.addList(new Liste1Fragment(), newListName);
+
+        /* add list to category in DB*/
+        for(int i = 0; i < allCategoriesName.size(); i++){
+            if(allCategoriesName.get(i).equals(currentCategoryName)){
+                addListToCategoryInDB(i,newListName);
+            }
+        }
         adapter.notifyDataSetChanged();
+
+        /*Show all lists of a category*/
+        for (int i = 0; i < datenbank.size(); i++){
+            int elementsCount = datenbank.get(i).size();
+            for(int j = 0; j < elementsCount; j++){
+                int categoryIndex = i;
+                String listName = datenbank.get(i).get(j);
+                Log.i("MainActivity", "Category " + categoryIndex + " besitzt Liste: " + listName + "\n");
+            }
+        }
+    }
+
+    private void addListToCategoryInDB(int indexOfCategory, String newListName){
+        datenbank.get(indexOfCategory).add(newListName);
+        Log.i("MainActivity", "Neue Liste " + datenbank.get(indexOfCategory).get(0)  + " eingefügt in Kategorie " + allCategoriesName.get(indexOfCategory) + "\n");
     }
 }

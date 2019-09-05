@@ -15,6 +15,7 @@ public class Liste1Fragment extends Fragment {
     View rootView;
     private String name;
     ArrayList<ListElement> allListElements;
+    private Category1Fragment mParentCategory;
 
     @Nullable
     @Override
@@ -36,6 +37,14 @@ public class Liste1Fragment extends Fragment {
         ListElementAdapter listElementsAdapter = new ListElementAdapter (getActivity(), allListElements, Liste1Fragment.this);
         ListView listView = (ListView) rootView.findViewById(R.id.listView_list_elements);
         listView.setAdapter(listElementsAdapter);
+    }
+
+    public void setParentCategory(Category1Fragment parentCategory){
+        mParentCategory = parentCategory;
+    }
+
+    public Category1Fragment getParentCategory(){
+        return mParentCategory;
     }
 
 }
