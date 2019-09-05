@@ -6,10 +6,10 @@
         android:id="@+id/group_categories"
         android:checkableBehavior="single"
         android:orderInCategory="1">
-        <item
+        <!--<item
             android:id="@+id/nav_category1"
             android:icon="@drawable/ic_category"
-            android:title="SWT" />
+            android:title="SWT" />-->
     </group>
 
     <item

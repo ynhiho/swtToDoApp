@@ -27,11 +27,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawer;
     private Category1Fragment categoryFragment;
     private NavigationView navView;
-    private Menu menu;
+    private Menu drawerMenu;
     private SimpleFragmentPagerAdapter adapter;
 
     private ArrayList<String> allCategoriesName = new ArrayList<>();
-    ArrayList<ArrayList<String>> datenbank = new ArrayList<>();
+    private ArrayList<ArrayList<String>> datenbank = new ArrayList<>();
+    private ArrayList<Liste1Fragment> allLists = new ArrayList<>();
 
     private String currentCategoryName;
 
@@ -54,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        initializeDefaultCategory();
+        navView = (NavigationView) findViewById(R.id.nav_view);
+        drawerMenu = navView.getMenu();
 
         /*FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new Category1Fragment()).commit();
             getSupportActionBar().setTitle("Kategorie 1");
-            navigationView.setCheckedItem(R.id.nav_category1);
+            /*navigationView.setCheckedItem(R.id.nav_category1);*/
         }
 
 
@@ -82,9 +84,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Create an adapter that knows which fragment should be shown on each page
         adapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager());
 
-        adapter.addList(new Liste1Fragment(), "Drogerie");
-        adapter.addList(new Liste1Fragment(), "Lebensmittel");
-
         // Set the adapter onto the view pager
         viewPager.setAdapter(adapter);
 
@@ -92,15 +91,70 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-
-
-
+        setDefaultState();
     }
 
-    private void initializeDefaultCategory(){
+    private void setDefaultState(){
         allCategoriesName.add("SWT");
+        datenbank.add(new ArrayList<String>());
         currentCategoryName = "SWT";
-        datenbank.add(new ArrayList());
+
+        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, "SWT").setIcon(R.drawable.ic_category);
+
+        addListToCategoryInDB(0, "Klausur");
+        addListToCategoryInDB(0, "Projekt");
+        addListToCategoryInDB(0, "Vorbereitung");
+
+        Liste1Fragment newList = new Liste1Fragment();
+        newList.setParentCategory("SWT");
+        newList.setName("Klausur");
+        allLists.add(newList);
+
+        Liste1Fragment newList2 = new Liste1Fragment();
+        newList2.setParentCategory("SWT");
+        newList2.setName("Projekt");
+        allLists.add(newList2);
+
+        Liste1Fragment newList3 = new Liste1Fragment();
+        newList3.setParentCategory("SWT");
+        newList3.setName("Vorbereitung");
+        allLists.add(newList3);
+
+
+
+        allCategoriesName.add("OOP");
+        datenbank.add(new ArrayList<String>());
+        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, "OOP").setIcon(R.drawable.ic_category);
+
+        addListToCategoryInDB(1, "Testat");
+        addListToCategoryInDB(1, "Üben");
+
+        Liste1Fragment newList4 = new Liste1Fragment();
+        newList4.setParentCategory("OOP");
+        newList4.setName("Testat");
+        allLists.add(newList4);
+
+        Liste1Fragment newList5 = new Liste1Fragment();
+        newList5.setParentCategory("OOP");
+        newList5.setName("Üben");
+        allLists.add(newList5);
+
+        allCategoriesName.add("GDV");
+        datenbank.add(new ArrayList<String>());
+        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, "GDV").setIcon(R.drawable.ic_category);
+        addListToCategoryInDB(2, "Shading");
+        addListToCategoryInDB(2, "Lighting");
+
+        Liste1Fragment newList6 = new Liste1Fragment();
+        newList6.setParentCategory("GDV");
+        newList6.setName("Shading");
+        allLists.add(newList6);
+
+        Liste1Fragment newList7 = new Liste1Fragment();
+        newList7.setParentCategory("GDV");
+        newList7.setName("Lighting");
+        allLists.add(newList7);
+
     }
 
     @Override
@@ -125,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-
         switch (item.getItemId()) {
             case R.id.nav_category_new:
                 openNewCategoryDialog();
@@ -137,7 +190,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 currentCategoryName = item.getTitle().toString();
                 getSupportActionBar().setTitle(currentCategoryName);
 
-                datenbank.add(new ArrayList<String>());
+                adapter.removeAllLists();
+                adapter.notifyDataSetChanged();
+
+                for(Liste1Fragment list : allLists) {
+                    if (list.getParentCategory().equals(currentCategoryName)) {
+                        adapter.addList(list, list.getName());
+                        adapter.notifyDataSetChanged();
+                    }
+                }
 
                 populateListView();
                 populateListElements();
@@ -173,10 +234,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void addNewCategory(String newCategoryName) {
         allCategoriesName.add(newCategoryName);
-
-        navView = (NavigationView) findViewById(R.id.nav_view);
-        menu = navView.getMenu();
-        menu.add(R.id.group_categories, Menu.NONE, 1, newCategoryName).setIcon(R.drawable.ic_category);
+        datenbank.add(new ArrayList<String>());
+        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, newCategoryName).setIcon(R.drawable.ic_category);
     }
 
     @Override
@@ -186,7 +245,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addNewList(String newListName) {
-        adapter.addList(new Liste1Fragment(), newListName);
+        Liste1Fragment newList = new Liste1Fragment();
+        newList.setParentCategory(currentCategoryName);
+        newList.setName(newListName);
+        allLists.add(newList);
+        adapter.addList(newList, newListName);
+        adapter.notifyDataSetChanged();
 
         /* add list to category in DB*/
         for(int i = 0; i < allCategoriesName.size(); i++){
@@ -194,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 addListToCategoryInDB(i,newListName);
             }
         }
-        adapter.notifyDataSetChanged();
 
         /*Show all lists of a category*/
         for (int i = 0; i < datenbank.size(); i++){

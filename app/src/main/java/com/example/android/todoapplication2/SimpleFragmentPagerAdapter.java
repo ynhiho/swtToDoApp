@@ -20,6 +20,7 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
         this.context = context;
     }
 
+
     @Override
     public Fragment getItem(int position) {
         return mAllLists.get(position);
@@ -28,6 +29,11 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
     public void addList(Liste1Fragment list, String title) {
         mAllLists.add(list);
         mAllListsNames.add(title);
+    }
+
+    public void removeAllLists(){
+        mAllLists.clear();
+        mAllListsNames.clear();
     }
 
     public void removeList(Liste1Fragment list, int position) {
@@ -44,6 +50,10 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return mAllListsNames.get(position);
+    }
+
+    public int getListsCount() {
+        return mAllListsNames.size();
     }
 
     /*final int PAGE_COUNT = 5;

@@ -13,9 +13,9 @@ import java.util.ArrayList;
 public class Liste1Fragment extends Fragment {
 
     View rootView;
-    private String name;
+    private String mName;
     ArrayList<ListElement> allListElements;
-    private Category1Fragment mParentCategory;
+    private String mParentCategory;
 
     @Nullable
     @Override
@@ -39,11 +39,19 @@ public class Liste1Fragment extends Fragment {
         listView.setAdapter(listElementsAdapter);
     }
 
-    public void setParentCategory(Category1Fragment parentCategory){
+    public void setName(String name){
+        mName = name;
+    }
+
+    public String getName(){
+        return mName;
+    }
+
+    public void setParentCategory(String parentCategory){
         mParentCategory = parentCategory;
     }
 
-    public Category1Fragment getParentCategory(){
+    public String getParentCategory(){
         return mParentCategory;
     }
 
