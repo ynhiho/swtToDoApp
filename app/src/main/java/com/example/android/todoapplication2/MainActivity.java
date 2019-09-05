@@ -95,66 +95,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setDefaultState(){
-        allCategoriesName.add("SWT");
-        datenbank.add(new ArrayList<String>());
-        currentCategoryName = "SWT";
+        int indexOfCategoryInArray;
+        indexOfCategoryInArray = setNewCategory("SWT");
+        addListToCategoryInDB(indexOfCategoryInArray, "Klausur");
+        addListToCategoryInDB(indexOfCategoryInArray, "Projekt");
+        addListToCategoryInDB(indexOfCategoryInArray, "Vorbereitung");
 
-        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, "SWT").setIcon(R.drawable.ic_category);
-
-        addListToCategoryInDB(0, "Klausur");
-        addListToCategoryInDB(0, "Projekt");
-        addListToCategoryInDB(0, "Vorbereitung");
-
-        Liste1Fragment newList = new Liste1Fragment();
-        newList.setParentCategory("SWT");
-        newList.setName("Klausur");
-        allLists.add(newList);
-
-        Liste1Fragment newList2 = new Liste1Fragment();
-        newList2.setParentCategory("SWT");
-        newList2.setName("Projekt");
-        allLists.add(newList2);
-
-        Liste1Fragment newList3 = new Liste1Fragment();
-        newList3.setParentCategory("SWT");
-        newList3.setName("Vorbereitung");
-        allLists.add(newList3);
+        setNewList("SWT", "Klausur");
+        setNewList("SWT", "Projekt");
+        setNewList("SWT", "Vorbereitung");
 
 
+        indexOfCategoryInArray = setNewCategory("OOP");
+        addListToCategoryInDB(indexOfCategoryInArray, "Vorlesung");
+        addListToCategoryInDB(indexOfCategoryInArray, "Labor");
 
-        allCategoriesName.add("OOP");
-        datenbank.add(new ArrayList<String>());
-        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, "OOP").setIcon(R.drawable.ic_category);
+        setNewList("OOP", "Vorlesung");
+        setNewList("OOP", "Labor");
 
-        addListToCategoryInDB(1, "Testat");
-        addListToCategoryInDB(1, "Üben");
 
-        Liste1Fragment newList4 = new Liste1Fragment();
-        newList4.setParentCategory("OOP");
-        newList4.setName("Testat");
-        allLists.add(newList4);
+        indexOfCategoryInArray = setNewCategory("GDV");
+        addListToCategoryInDB(indexOfCategoryInArray, "Shading");
+        addListToCategoryInDB(indexOfCategoryInArray, "Lighting");
 
-        Liste1Fragment newList5 = new Liste1Fragment();
-        newList5.setParentCategory("OOP");
-        newList5.setName("Üben");
-        allLists.add(newList5);
-
-        allCategoriesName.add("GDV");
-        datenbank.add(new ArrayList<String>());
-        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, "GDV").setIcon(R.drawable.ic_category);
-        addListToCategoryInDB(2, "Shading");
-        addListToCategoryInDB(2, "Lighting");
-
-        Liste1Fragment newList6 = new Liste1Fragment();
-        newList6.setParentCategory("GDV");
-        newList6.setName("Shading");
-        allLists.add(newList6);
-
-        Liste1Fragment newList7 = new Liste1Fragment();
-        newList7.setParentCategory("GDV");
-        newList7.setName("Lighting");
-        allLists.add(newList7);
-
+        setNewList("GDV", "Shading");
+        setNewList("GDV", "Lighting");
     }
 
     @Override
@@ -233,9 +198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addNewCategory(String newCategoryName) {
-        allCategoriesName.add(newCategoryName);
-        datenbank.add(new ArrayList<String>());
-        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, newCategoryName).setIcon(R.drawable.ic_category);
+        setNewCategory(newCategoryName);
     }
 
     @Override
@@ -268,6 +231,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.i("MainActivity", "Category " + categoryIndex + " besitzt Liste: " + listName + "\n");
             }
         }
+    }
+
+    private int setNewCategory(String categoryName){
+        allCategoriesName.add(categoryName);
+        datenbank.add(new ArrayList<String>());
+        currentCategoryName = categoryName;
+
+        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, categoryName).setIcon(R.drawable.ic_category);
+
+        /* return index of category */
+        return allCategoriesName.size() - 1;
+    }
+
+    private void setNewList(String parentCategory, String listName){
+        Liste1Fragment newList = new Liste1Fragment();
+        newList.setParentCategory(parentCategory);
+        newList.setName(listName);
+        allLists.add(newList);
     }
 
     private void addListToCategoryInDB(int indexOfCategory, String newListName){
