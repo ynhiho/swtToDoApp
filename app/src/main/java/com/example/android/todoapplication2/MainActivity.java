@@ -58,13 +58,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navView = (NavigationView) findViewById(R.id.nav_view);
         drawerMenu = navView.getMenu();
 
-        /*FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openNewListElementDialog();
-            }
-        });*/
 
         // doesn't activate when device is rotated for example
         if (savedInstanceState == null) {
@@ -75,6 +68,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             /*navigationView.setCheckedItem(R.id.nav_category1);*/
         }
 
+        /*FloatingActionButton fab = findViewById(R.id.fab);
+        fab.bringToFront();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openNewListElementDialog();
+            }
+        });*/
 
         /* Tab Layout */
 
@@ -191,19 +192,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         newCategoryDialog.show(getSupportFragmentManager(), "new category dialog");
     }
 
-    private void openNewListElementDialog() {
-        NewListElementDialog newListElementDialog = new NewListElementDialog();
-        newListElementDialog.show(getSupportFragmentManager(), "new list element dialog");
-    }
 
     @Override
     public void addNewCategory(String newCategoryName) {
         setNewCategory(newCategoryName);
-    }
-
-    @Override
-    public void addNewListElement(String new_list_element) {
-        Toast.makeText(this, "Neuer Listeneintrag: " + new_list_element, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -255,4 +247,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         datenbank.get(indexOfCategory).add(newListName);
         Log.i("MainActivity", "Neue Liste " + datenbank.get(indexOfCategory).get(0)  + " eingefügt in Kategorie " + allCategoriesName.get(indexOfCategory) + "\n");
     }
+
+
+    public void openNewListElementDialog(View view) {
+        NewListElementDialog newListElementDialog = new NewListElementDialog();
+        newListElementDialog.show(getSupportFragmentManager(), "new list element dialog");
+    }
+
+    @Override
+    public void addNewListElement(String new_list_element) {
+        Toast.makeText(this, "Neuer Listeneintrag: " + new_list_element, Toast.LENGTH_SHORT).show();
+    }
+
 }
