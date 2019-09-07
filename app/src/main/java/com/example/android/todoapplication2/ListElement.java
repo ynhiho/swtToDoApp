@@ -2,13 +2,13 @@ package com.example.android.todoapplication2;
 
 public class ListElement {
 
-    private String mListElementName;
+    private String mName;
 
-    public ListElement(String listElementName){
-        mListElementName = listElementName;
+    public ListElement(String name){
+        mName = name;
     }
 
-    public String getmListElementName(){
-        return mListElementName;
+    public String getName(){
+        return mName;
     }
 }

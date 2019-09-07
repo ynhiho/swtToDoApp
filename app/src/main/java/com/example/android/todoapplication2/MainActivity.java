@@ -3,7 +3,6 @@ package com.example.android.todoapplication2;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -19,24 +18,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NewListElementDialog.NewListElementDialogListener, NewCategoryDialog.NewCategoryDialogListener, NewListDialog.NewListDialogListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NewListElementDialog.NewListElementDialogListener, NewCategoryDialog.NewCategoryDialogListener, NewListDialog.NewListDialogListener {
 
+    ViewPager viewPager;
     private DrawerLayout drawer;
     private Category1Fragment categoryFragment;
     private NavigationView navView;
     private Menu drawerMenu;
     private SimpleFragmentPagerAdapter adapter;
-
     private ArrayList<String> allCategoriesName = new ArrayList<>();
     private ArrayList<ArrayList<String>> datenbank = new ArrayList<>();
-    private ArrayList<Liste1Fragment> allLists = new ArrayList<>();
+    private ArrayList<Liste1Fragment> todoLists = new ArrayList<>();
 
     private String currentCategoryName;
+    private String currentListName;
 
-    public String GetCurrentCategory() { return currentCategoryName; }
+    public String GetCurrentCategory() {
+        return currentCategoryName;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,19 +69,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             /*navigationView.setCheckedItem(R.id.nav_category1);*/
         }
 
-        /*FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.bringToFront();
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openNewListElementDialog();
             }
-        });*/
+        });
 
         /* Tab Layout */
 
         // Find the view pager that will allow the user to swipe between fragments
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
 
         // Create an adapter that knows which fragment should be shown on each page
         adapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager());
@@ -92,10 +93,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                Liste1Fragment currentList = adapter.getItem(i);
+                currentListName = currentList.getName();
+                Log.i("MainActivity", "Aktive Liste: " + currentListName);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+
         setDefaultState();
     }
 
-    private void setDefaultState(){
+    private void setDefaultState() {
         int indexOfCategoryInArray;
         indexOfCategoryInArray = setNewCategory("SWT");
         addListToCategoryInDB(indexOfCategoryInArray, "Klausur");
@@ -103,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         addListToCategoryInDB(indexOfCategoryInArray, "Vorbereitung");
 
         setNewList("SWT", "Klausur");
+        currentListName = "Klausur";
         setNewList("SWT", "Projekt");
         setNewList("SWT", "Vorbereitung");
 
@@ -156,16 +178,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 currentCategoryName = item.getTitle().toString();
                 getSupportActionBar().setTitle(currentCategoryName);
 
-                adapter.removeAllLists();
+                adapter.clearTodoLists();
                 adapter.notifyDataSetChanged();
-
-                for(Liste1Fragment list : allLists) {
-                    if (list.getParentCategory().equals(currentCategoryName)) {
-                        adapter.addList(list, list.getName());
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-
                 populateListView();
                 populateListElements();
                 Log.i("MainActivity", "Selected Category: " + item.getTitle());
@@ -175,8 +189,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void populateListView() {}
-    private void populateListElements() {}
+    private void populateListView() {
+
+        ArrayList<String> listsOfCategory = new ArrayList<>();
+
+        for (Liste1Fragment list : todoLists) {
+            if (list.getParentCategory().equals(currentCategoryName)) {
+                listsOfCategory.add(list.getName());
+                adapter.addList(list, list.getName());
+                adapter.notifyDataSetChanged();
+            }
+        }
+
+        currentListName = listsOfCategory.get(0);
+
+        Log.i("MainActivity", "Aufgewählte Liste: " + currentListName);
+    }
+
+    private void populateListElements() {
+    }
 
     @Override
     public void onBackPressed() {
@@ -200,24 +231,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addNewList(String newListName) {
-        Liste1Fragment newList = new Liste1Fragment();
-        newList.setParentCategory(currentCategoryName);
-        newList.setName(newListName);
-        allLists.add(newList);
+        Liste1Fragment newList = setNewList(currentCategoryName, newListName);
         adapter.addList(newList, newListName);
         adapter.notifyDataSetChanged();
 
         /* add list to category in DB*/
-        for(int i = 0; i < allCategoriesName.size(); i++){
-            if(allCategoriesName.get(i).equals(currentCategoryName)){
-                addListToCategoryInDB(i,newListName);
+        for (int i = 0; i < allCategoriesName.size(); i++) {
+            if (allCategoriesName.get(i).equals(currentCategoryName)) {
+                addListToCategoryInDB(i, newListName);
             }
         }
 
         /*Show all lists of a category*/
-        for (int i = 0; i < datenbank.size(); i++){
+        for (int i = 0; i < datenbank.size(); i++) {
             int elementsCount = datenbank.get(i).size();
-            for(int j = 0; j < elementsCount; j++){
+            for (int j = 0; j < elementsCount; j++) {
                 int categoryIndex = i;
                 String listName = datenbank.get(i).get(j);
                 Log.i("MainActivity", "Category " + categoryIndex + " besitzt Liste: " + listName + "\n");
@@ -225,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private int setNewCategory(String categoryName){
+    private int setNewCategory(String categoryName) {
         allCategoriesName.add(categoryName);
         datenbank.add(new ArrayList<String>());
         currentCategoryName = categoryName;
@@ -236,27 +264,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return allCategoriesName.size() - 1;
     }
 
-    private void setNewList(String parentCategory, String listName){
+    private Liste1Fragment setNewList(String parentCategory, String listName) {
         Liste1Fragment newList = new Liste1Fragment();
-        newList.setParentCategory(parentCategory);
+        newList.setCategory(parentCategory);
         newList.setName(listName);
-        allLists.add(newList);
+        todoLists.add(newList);
+
+        return newList;
     }
 
-    private void addListToCategoryInDB(int indexOfCategory, String newListName){
+    private void addListToCategoryInDB(int indexOfCategory, String newListName) {
         datenbank.get(indexOfCategory).add(newListName);
-        Log.i("MainActivity", "Neue Liste " + datenbank.get(indexOfCategory).get(0)  + " eingefügt in Kategorie " + allCategoriesName.get(indexOfCategory) + "\n");
+        Log.i("MainActivity", "Neue Liste " + datenbank.get(indexOfCategory).get(0) + " eingefügt in Kategorie " + allCategoriesName.get(indexOfCategory) + "\n");
     }
 
 
-    public void openNewListElementDialog(View view) {
+    public void openNewListElementDialog() {
         NewListElementDialog newListElementDialog = new NewListElementDialog();
         newListElementDialog.show(getSupportFragmentManager(), "new list element dialog");
     }
 
     @Override
-    public void addNewListElement(String new_list_element) {
-        Toast.makeText(this, "Neuer Listeneintrag: " + new_list_element, Toast.LENGTH_SHORT).show();
+    public void addNewListElement(String newListElementName) {
+        for (Liste1Fragment list : todoLists) {
+            if (list.getName().equals(currentListName)) {
+                list.addListElement(newListElementName);
+            }
+        }
+        Toast.makeText(this, "Neuer Listeneintrag: " + newListElementName, Toast.LENGTH_SHORT).show();
     }
+
 
 }

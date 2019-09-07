@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,29 +17,38 @@ public class Liste1Fragment extends Fragment {
 
     View rootView;
     private String mName;
-    ArrayList<ListElement> allListElements;
+    ArrayList<ListElement> allListElements = new ArrayList<ListElement>();
     private String mParentCategory;
+    ListElementAdapter mListElementsAdapter;
+    ListView mListView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.list_elements_view, container, false);
 
-        allListElements = new ArrayList<ListElement>();
+        mListElementsAdapter = new ListElementAdapter (getActivity(), allListElements);
+        mListView = rootView.findViewById(R.id.listView_list_elements);
+        mListView.setAdapter(mListElementsAdapter);
+
         allListElements.add(new ListElement("schlafen"));
         allListElements.add(new ListElement("essen"));
         allListElements.add(new ListElement("spielen"));
 
-        displayAllListElements();
+        addListElement("Kacka");
+
+//        displayAllListElements();
 
         return rootView;
     }
 
-    private void displayAllListElements(){
+    public void addListElement(String newListElementName){
+        allListElements.add(new ListElement(newListElementName));
+        displayAllListElements();
+    }
 
-        ListElementAdapter listElementsAdapter = new ListElementAdapter (getActivity(), allListElements, Liste1Fragment.this);
-        ListView listView = (ListView) rootView.findViewById(R.id.listView_list_elements);
-        listView.setAdapter(listElementsAdapter);
+    private void displayAllListElements(){
+        mListElementsAdapter.notifyDataSetChanged();
     }
 
     public void setName(String name){
@@ -49,7 +59,7 @@ public class Liste1Fragment extends Fragment {
         return mName;
     }
 
-    public void setParentCategory(String parentCategory){
+    public void setCategory(String parentCategory){
         mParentCategory = parentCategory;
     }
 

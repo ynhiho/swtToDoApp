@@ -22,7 +22,7 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
 
 
     @Override
-    public Fragment getItem(int position) {
+    public Liste1Fragment getItem(int position) {
         return mAllLists.get(position);
     }
 
@@ -31,7 +31,7 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
         mAllListsNames.add(title);
     }
 
-    public void removeAllLists(){
+    public void clearTodoLists(){
         mAllLists.clear();
         mAllListsNames.clear();
     }

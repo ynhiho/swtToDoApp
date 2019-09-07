@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class ListElementAdapter extends ArrayAdapter<ListElement> {
     private Handler mHandler = new Handler();
 
-    public ListElementAdapter(Activity context, ArrayList<ListElement> listElements, Liste1Fragment fragment) {
+    public ListElementAdapter(Activity context, ArrayList<ListElement> listElements) {
         // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
         // the second argument is used when the ArrayAdapter is populating a single TextView.
         // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
@@ -40,7 +40,7 @@ public class ListElementAdapter extends ArrayAdapter<ListElement> {
         // Find the TextView in the list_item.xml layout with the ID
         final TextView listItemTextView = listElementView.findViewById(R.id.textView_list_element_name);
         // set this text on the name TextView
-        listItemTextView.setText(currentItem.getmListElementName());
+        listItemTextView.setText(currentItem.getName());
 
         // Find the Checkbox in the list_item.xml layout with the ID
         CheckBox checkBox = listElementView.findViewById(R.id.checkBox_list_element);

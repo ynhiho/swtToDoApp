@@ -51,7 +51,6 @@
                 android:layout_marginTop="330dp"
                 android:layout_marginRight="16dp"
                 android:contentDescription="add_list_element"
-                android:onClick="openNewListElementDialog"
                 android:src="@drawable/ic_add_white" />
         </FrameLayout>
 
