@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -24,20 +26,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ViewPager viewPager;
     private DrawerLayout drawer;
-    private Category1Fragment categoryFragment;
     private NavigationView navView;
     private Menu drawerMenu;
     private SimpleFragmentPagerAdapter adapter;
-    private ArrayList<String> allCategoriesName = new ArrayList<>();
-    private ArrayList<ArrayList<String>> datenbank = new ArrayList<>();
-    private ArrayList<Liste1Fragment> todoLists = new ArrayList<>();
 
-    private String currentCategoryName;
-    private String currentListName;
 
-    public String GetCurrentCategory() {
-        return currentCategoryName;
-    }
+    ArrayList<String> categoryDatabase = new ArrayList<>();
+    ArrayList<TodoTab> tabDatabase = new ArrayList<>();
+    static ArrayList<Todo> todoDatabase = new ArrayList<>();
+
+
+    String currentCategory;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,18 +56,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navView = (NavigationView) findViewById(R.id.nav_view);
+        navView = findViewById(R.id.nav_view);
         drawerMenu = navView.getMenu();
-
-
-        // doesn't activate when device is rotated for example
-        if (savedInstanceState == null) {
-            // Fragment that is shown when app is started
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new Category1Fragment()).commit();
-            getSupportActionBar().setTitle("Kategorie 1");
-            /*navigationView.setCheckedItem(R.id.nav_category1);*/
-        }
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.bringToFront();
@@ -79,18 +69,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         /* Tab Layout */
-
-        // Find the view pager that will allow the user to swipe between fragments
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-
-        // Create an adapter that knows which fragment should be shown on each page
+        viewPager = findViewById(R.id.viewpager);
         adapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager());
-
-        // Set the adapter onto the view pager
         viewPager.setAdapter(adapter);
-
-        // Give the TabLayout the ViewPager
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        TabLayout tabLayout = findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -101,9 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onPageSelected(int i) {
-                Liste1Fragment currentList = adapter.getItem(i);
-                currentListName = currentList.getName();
-                Log.i("MainActivity", "Aktive Liste: " + currentListName);
+                adapter.UpdateTodoList(queryTodos(adapter.getPageTitle(i).toString()));
             }
 
             @Override
@@ -112,37 +92,75 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        setupTestDatabase();
+        currentCategory = categoryDatabase.get(0);
+        switchCategory(currentCategory);
 
-        setDefaultState();
+        // doesn't activate when device is rotated for example
+        if (savedInstanceState == null) {
+            FragmentManager fm = MainActivity.this.getSupportFragmentManager();
+            fm.executePendingTransactions();
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.replace(R.id.fragment_container, adapter.mTodoList).commit();
+        }
     }
 
-    private void setDefaultState() {
-        int indexOfCategoryInArray;
-        indexOfCategoryInArray = setNewCategory("SWT");
-        addListToCategoryInDB(indexOfCategoryInArray, "Klausur");
-        addListToCategoryInDB(indexOfCategoryInArray, "Projekt");
-        addListToCategoryInDB(indexOfCategoryInArray, "Vorbereitung");
+    void setupTestDatabase() {
+        addNewCategory("SWT");
+        addNewCategory("OOP");
+        addNewCategory("GDV");
 
-        setNewList("SWT", "Klausur");
-        currentListName = "Klausur";
-        setNewList("SWT", "Projekt");
-        setNewList("SWT", "Vorbereitung");
+        tabDatabase.add(new TodoTab("Klausur", "SWT"));
+        tabDatabase.add(new TodoTab("Projekt", "SWT"));
+        tabDatabase.add(new TodoTab("Vorlesung", "OOP"));
 
+        todoDatabase.add(new Todo("Projekt", "Ich muss mal!"));
+        todoDatabase.add(new Todo("Projekt", "Aufpassen!"));
+        todoDatabase.add(new Todo("Klausur", "Mathe"));
+        todoDatabase.add(new Todo("Vorlesung", "Pipi"));
+    }
 
-        indexOfCategoryInArray = setNewCategory("OOP");
-        addListToCategoryInDB(indexOfCategoryInArray, "Vorlesung");
-        addListToCategoryInDB(indexOfCategoryInArray, "Labor");
+    void switchCategory(String category)
+    {
+        currentCategory = category;
+        getSupportActionBar().setTitle(category);
 
-        setNewList("OOP", "Vorlesung");
-        setNewList("OOP", "Labor");
+        adapter.clearView();
+        ArrayList<TodoTab> filteredTodoTabs = queryTodoTabs(currentCategory);
+        for (TodoTab todoTab : filteredTodoTabs)
+            adapter.addPage(todoTab.Name);
 
+        if(filteredTodoTabs.size() > 0)
+            adapter.UpdateTodoList(queryTodos(filteredTodoTabs.get(0).Name));
 
-        indexOfCategoryInArray = setNewCategory("GDV");
-        addListToCategoryInDB(indexOfCategoryInArray, "Shading");
-        addListToCategoryInDB(indexOfCategoryInArray, "Lighting");
+        adapter.notifyDataSetChanged();
+        viewPager.setCurrentItem(0);
+    }
 
-        setNewList("GDV", "Shading");
-        setNewList("GDV", "Lighting");
+    // Provisionally Database query
+    ArrayList<TodoTab> queryTodoTabs(String category)
+    {
+        ArrayList<TodoTab> todoTabs = new ArrayList<>();
+        for (TodoTab todoTab : tabDatabase) {
+            if(todoTab.Category.equals(category))
+            {
+                todoTabs.add(todoTab);
+            }
+        }
+
+        return todoTabs;
+    }
+
+    // Provisionally Database Query
+    ArrayList<Todo> queryTodos(String tab)
+    {
+        ArrayList<Todo> todos = new ArrayList<>();
+        for (Todo todo : todoDatabase) {
+            if(todo.tab.equals(tab))
+                todos.add(todo);
+        }
+
+        return todos;
     }
 
     @Override
@@ -175,38 +193,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Kategorie bearbeiten", Toast.LENGTH_SHORT).show();
                 break;
             default:
-                currentCategoryName = item.getTitle().toString();
-                getSupportActionBar().setTitle(currentCategoryName);
-
-                adapter.clearTodoLists();
-                adapter.notifyDataSetChanged();
-                populateListView();
-                populateListElements();
-                Log.i("MainActivity", "Selected Category: " + item.getTitle());
+                switchCategory(item.getTitle().toString());
         }
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private void populateListView() {
-
-        ArrayList<String> listsOfCategory = new ArrayList<>();
-
-        for (Liste1Fragment list : todoLists) {
-            if (list.getParentCategory().equals(currentCategoryName)) {
-                listsOfCategory.add(list.getName());
-                adapter.addList(list, list.getName());
-                adapter.notifyDataSetChanged();
-            }
-        }
-
-        currentListName = listsOfCategory.get(0);
-
-        Log.i("MainActivity", "Aufgewählte Liste: " + currentListName);
-    }
-
-    private void populateListElements() {
     }
 
     @Override
@@ -223,61 +214,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         newCategoryDialog.show(getSupportFragmentManager(), "new category dialog");
     }
 
-
     @Override
-    public void addNewCategory(String newCategoryName) {
-        setNewCategory(newCategoryName);
+    public void addNewCategory(String name) {
+        categoryDatabase.add(name);
+
+        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, name).setIcon(R.drawable.ic_category);
     }
-
-    @Override
-    public void addNewList(String newListName) {
-        Liste1Fragment newList = setNewList(currentCategoryName, newListName);
-        adapter.addList(newList, newListName);
-        adapter.notifyDataSetChanged();
-
-        /* add list to category in DB*/
-        for (int i = 0; i < allCategoriesName.size(); i++) {
-            if (allCategoriesName.get(i).equals(currentCategoryName)) {
-                addListToCategoryInDB(i, newListName);
-            }
-        }
-
-        /*Show all lists of a category*/
-        for (int i = 0; i < datenbank.size(); i++) {
-            int elementsCount = datenbank.get(i).size();
-            for (int j = 0; j < elementsCount; j++) {
-                int categoryIndex = i;
-                String listName = datenbank.get(i).get(j);
-                Log.i("MainActivity", "Category " + categoryIndex + " besitzt Liste: " + listName + "\n");
-            }
-        }
-    }
-
-    private int setNewCategory(String categoryName) {
-        allCategoriesName.add(categoryName);
-        datenbank.add(new ArrayList<String>());
-        currentCategoryName = categoryName;
-
-        drawerMenu.add(R.id.group_categories, Menu.NONE, 1, categoryName).setIcon(R.drawable.ic_category);
-
-        /* return index of category */
-        return allCategoriesName.size() - 1;
-    }
-
-    private Liste1Fragment setNewList(String parentCategory, String listName) {
-        Liste1Fragment newList = new Liste1Fragment();
-        newList.setCategory(parentCategory);
-        newList.setName(listName);
-        todoLists.add(newList);
-
-        return newList;
-    }
-
-    private void addListToCategoryInDB(int indexOfCategory, String newListName) {
-        datenbank.get(indexOfCategory).add(newListName);
-        Log.i("MainActivity", "Neue Liste " + datenbank.get(indexOfCategory).get(0) + " eingefügt in Kategorie " + allCategoriesName.get(indexOfCategory) + "\n");
-    }
-
 
     public void openNewListElementDialog() {
         NewListElementDialog newListElementDialog = new NewListElementDialog();
@@ -286,13 +228,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addNewListElement(String newListElementName) {
-        for (Liste1Fragment list : todoLists) {
-            if (list.getName().equals(currentListName)) {
-                list.addListElement(newListElementName);
-            }
-        }
+
         Toast.makeText(this, "Neuer Listeneintrag: " + newListElementName, Toast.LENGTH_SHORT).show();
     }
 
-
+    @Override
+    public void addNewList(String newListName) {
+        Log.i("MY", "addNewList called on MainActivity!");
+    }
 }
