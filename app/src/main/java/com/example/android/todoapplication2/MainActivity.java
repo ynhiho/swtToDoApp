@@ -263,7 +263,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addNewList(String newListName) {
-        Log.i("MY", "addNewList called on MainActivity!");
         adapter.addPage(newListName);
         addNewListDB(newListName);
     }
