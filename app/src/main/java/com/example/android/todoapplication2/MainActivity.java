@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     String currentCategory;
+    String currentTab;
 
 
     @Override
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onPageSelected(int i) {
                 adapter.UpdateTodoList(queryTodos(adapter.getPageTitle(i).toString()));
+                currentTab = adapter.getPageTitle(i).toString();
             }
 
             @Override
@@ -96,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         currentCategory = categoryDatabase.get(0);
         switchCategory(currentCategory);
 
+        currentTab = queryTodoTabs(currentCategory).get(0).Name;
+
         // doesn't activate when device is rotated for example
         if (savedInstanceState == null) {
             FragmentManager fm = MainActivity.this.getSupportFragmentManager();
@@ -107,17 +111,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     void setupTestDatabase() {
         addNewCategory("SWT");
-        addNewCategory("OOP");
+        addNewCategory("AV");
         addNewCategory("GDV");
 
         tabDatabase.add(new TodoTab("Klausur", "SWT"));
         tabDatabase.add(new TodoTab("Projekt", "SWT"));
-        tabDatabase.add(new TodoTab("Vorlesung", "OOP"));
 
-        todoDatabase.add(new Todo("Projekt", "Ich muss mal!"));
-        todoDatabase.add(new Todo("Projekt", "Aufpassen!"));
-        todoDatabase.add(new Todo("Klausur", "Mathe"));
-        todoDatabase.add(new Todo("Vorlesung", "Pipi"));
+        tabDatabase.add(new TodoTab("Vorlesung", "AV"));
+        tabDatabase.add(new TodoTab("Praktikum", "AV"));
+        tabDatabase.add(new TodoTab("Studientagebuch", "AV"));
+
+        tabDatabase.add(new TodoTab("Shading", "GDV"));
+
+        todoDatabase.add(new Todo("Projekt", "Dokumentation schreiben"));
+        todoDatabase.add(new Todo("Projekt", "Diagramme erstellen"));
+        todoDatabase.add(new Todo("Projekt", "Prototypen entwickeln"));
+        todoDatabase.add(new Todo("Klausur", "Notizen zusammenfassen"));
+        todoDatabase.add(new Todo("Klausur", "Mit Lerngruppe treffen"));
+        todoDatabase.add(new Todo("Klausur", "Lernzettel schreiben"));
+        todoDatabase.add(new Todo("Klausur", "Aufgaben bearbeiten"));
+
+        todoDatabase.add(new Todo("Vorlesung", "Notizen machen"));
+        todoDatabase.add(new Todo("Vorlesung", "Vorlesung besuchen"));
+        todoDatabase.add(new Todo("Praktikum", "Aufnahmen machen"));
+        todoDatabase.add(new Todo("Praktikum", "Locations finden"));
+        todoDatabase.add(new Todo("Praktikum", "Storyboard schreiben"));
+        todoDatabase.add(new Todo("Studientagebuch", "Nach Kamerasystemen recherchieren"));
+        todoDatabase.add(new Todo("Studientagebuch", "Aufsatz schreiben"));
+
+        todoDatabase.add(new Todo("Shading", "Shader erstellen"));
+        todoDatabase.add(new Todo("Shading", "Texturen finden"));
     }
 
     void switchCategory(String category)
@@ -228,12 +251,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addNewListElement(String newListElementName) {
-
         Toast.makeText(this, "Neuer Listeneintrag: " + newListElementName, Toast.LENGTH_SHORT).show();
+
+        addNewListElementDB(newListElementName);
+        adapter.UpdateTodoList(queryTodos(currentTab));
+    }
+
+    private void addNewListElementDB(String newListElementName) {
+        todoDatabase.add(new Todo(currentTab, newListElementName));
     }
 
     @Override
     public void addNewList(String newListName) {
         Log.i("MY", "addNewList called on MainActivity!");
+        adapter.addPage(newListName);
+        addNewListDB(newListName);
+    }
+
+    private void addNewListDB(String newListName){
+        tabDatabase.add(new TodoTab(newListName, currentCategory));
     }
 }

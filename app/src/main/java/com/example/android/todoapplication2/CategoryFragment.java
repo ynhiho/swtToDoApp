@@ -9,14 +9,14 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-public class Category1Fragment extends Fragment {
+public class CategoryFragment extends Fragment {
 
     View rootView;
     private String name;
     private ArrayList<TodoTabFragment> allLists = new ArrayList<>();
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_category1, container, false);
+        rootView = inflater.inflate(R.layout.fragment_category, container, false);
 
         getFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new TodoTabFragment()).commit();

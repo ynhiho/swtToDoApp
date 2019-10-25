@@ -48,6 +48,7 @@ public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter {
     public void addPage(String title) {
         mTodoTabs.add(TodoTabFragment.newInstance());
         mTodoTabTitles.add(title);
+        notifyDataSetChanged();
     }
 
     public void removePage(int position) {
