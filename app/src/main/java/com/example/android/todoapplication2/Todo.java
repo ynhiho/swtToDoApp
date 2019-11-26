@@ -4,9 +4,13 @@ public class Todo
 {
     public String Text;
     public String tab;
+    public boolean isChecked;
+    public int Id;
 
-    public Todo(String tab, String text) {
+    public Todo(int id, String tab, String text, boolean isChecked) {
+        Id = id;
         Text = text;
         this.tab = tab;
+        this.isChecked = isChecked;
     }
 }

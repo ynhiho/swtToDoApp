@@ -1,5 +1,7 @@
 package com.example.android.todoapplication2;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -29,6 +31,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navView;
     private Menu drawerMenu;
     private SimpleFragmentPagerAdapter adapter;
+
+    private final String PrefName = "Todo_App_Pref_Name";
+    private final String TodoIdPrefName = "Todo_Id";
+    private SharedPreferences SharedPreferences;
 
 
     ArrayList<String> categoryDatabase = new ArrayList<>();
@@ -94,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        SharedPreferences = getSharedPreferences(PrefName, Context.MODE_PRIVATE);
+
         setupTestDatabase();
         currentCategory = categoryDatabase.get(0);
         switchCategory(currentCategory);
@@ -109,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    // Only for Debug Purpose
     void setupTestDatabase() {
         addNewCategory("SWT");
         addNewCategory("AV");
@@ -123,24 +132,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         tabDatabase.add(new TodoTab("Shading", "GDV"));
 
-        todoDatabase.add(new Todo("Projekt", "Dokumentation schreiben"));
-        todoDatabase.add(new Todo("Projekt", "Diagramme erstellen"));
-        todoDatabase.add(new Todo("Projekt", "Prototypen entwickeln"));
-        todoDatabase.add(new Todo("Klausur", "Notizen zusammenfassen"));
-        todoDatabase.add(new Todo("Klausur", "Mit Lerngruppe treffen"));
-        todoDatabase.add(new Todo("Klausur", "Lernzettel schreiben"));
-        todoDatabase.add(new Todo("Klausur", "Aufgaben bearbeiten"));
+        int id = GetCurrentTodoId();
+        todoDatabase.add(new Todo(++id, "Projekt", "Dokumentation schreiben", true));
+        todoDatabase.add(new Todo(++id,"Projekt", "Diagramme erstellen", false));
+        todoDatabase.add(new Todo(++id,"Projekt", "Prototypen entwickeln", true));
+        todoDatabase.add(new Todo(++id,"Klausur", "Notizen zusammenfassen", false));
+        todoDatabase.add(new Todo(++id,"Klausur", "Mit Lerngruppe treffen", false));
+        todoDatabase.add(new Todo(++id,"Klausur", "Lernzettel schreiben", true));
+        todoDatabase.add(new Todo(++id,"Klausur", "Aufgaben bearbeiten", false));
 
-        todoDatabase.add(new Todo("Vorlesung", "Notizen machen"));
-        todoDatabase.add(new Todo("Vorlesung", "Vorlesung besuchen"));
-        todoDatabase.add(new Todo("Praktikum", "Aufnahmen machen"));
-        todoDatabase.add(new Todo("Praktikum", "Locations finden"));
-        todoDatabase.add(new Todo("Praktikum", "Storyboard schreiben"));
-        todoDatabase.add(new Todo("Studientagebuch", "Nach Kamerasystemen recherchieren"));
-        todoDatabase.add(new Todo("Studientagebuch", "Aufsatz schreiben"));
+        todoDatabase.add(new Todo(++id,"Vorlesung", "Notizen machen", false));
+        todoDatabase.add(new Todo(++id,"Vorlesung", "Vorlesung besuchen", false));
+        todoDatabase.add(new Todo(++id,"Praktikum", "Aufnahmen machen",true));
+        todoDatabase.add(new Todo(++id,"Praktikum", "Locations finden", false));
+        todoDatabase.add(new Todo(++id,"Praktikum", "Storyboard schreiben", false));
+        todoDatabase.add(new Todo(++id,"Studientagebuch", "Nach Kamerasystemen recherchieren", false));
+        todoDatabase.add(new Todo(++id,"Studientagebuch", "Aufsatz schreiben", false));
 
-        todoDatabase.add(new Todo("Shading", "Shader erstellen"));
-        todoDatabase.add(new Todo("Shading", "Texturen finden"));
+        todoDatabase.add(new Todo(++id,"Shading", "Shader erstellen", false));
+        todoDatabase.add(new Todo(++id,"Shading", "Texturen finden",true));
+
+        SetCurrentTodoId(id);
+    }
+
+    int GetCurrentTodoId()
+    {
+        return SharedPreferences.getInt(TodoIdPrefName, 0);
+    }
+
+    void SetCurrentTodoId(int value)
+    {
+        SharedPreferences.Editor editor = SharedPreferences.edit();
+        editor.putInt(TodoIdPrefName, value);
+        editor.commit();
     }
 
     void switchCategory(String category)
@@ -184,6 +208,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         return todos;
+    }
+
+    // Provisionally Database Query
+    public static void EditTodoDatabaseEntry(int id, boolean isChecked)
+    {
+        for (Todo todo : todoDatabase) {
+            if(todo.Id == id)
+            {
+                todo.isChecked = isChecked;
+            }
+        }
     }
 
     @Override
@@ -258,7 +293,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void addNewListElementDB(String newListElementName) {
-        todoDatabase.add(new Todo(currentTab, newListElementName));
+        int id = GetCurrentTodoId();
+        id++;
+        todoDatabase.add(new Todo(id, currentTab, newListElementName, false));
+        SetCurrentTodoId(id);
     }
 
     @Override

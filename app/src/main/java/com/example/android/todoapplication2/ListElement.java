@@ -3,11 +3,13 @@ package com.example.android.todoapplication2;
 public class ListElement {
 
     private String mName;
-    private boolean checked;
+    private boolean isChecked;
+    private int Id;
 
-    public ListElement(String name){
+    public ListElement(int id, String name, boolean isChecked){
+        Id = id;
         mName = name;
-        checked = false;
+        this.isChecked = isChecked;
     }
 
     public String getName(){
@@ -15,10 +17,12 @@ public class ListElement {
     }
 
     public boolean getChecked(){
-        return checked;
+        return isChecked;
     }
 
+    public int getId() {return Id; }
+
     public void setChecked(boolean checkedState){
-        checked = checkedState;
+        isChecked = checkedState;
     }
 }

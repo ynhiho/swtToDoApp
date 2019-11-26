@@ -44,6 +44,29 @@ public class ListElementAdapter extends ArrayAdapter<ListElement> {
 
         // Find the Checkbox in the list_item.xml layout with the ID
         CheckBox checkBox = listElementView.findViewById(R.id.checkBox_list_element);
+        checkBox.setChecked(currentItem.getChecked());
+        checkBox.jumpDrawablesToCurrentState();
+
+        checkBox.setOnClickListener(new CompoundButton.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                ListElement element = getItem(position);
+                boolean isChecked = !element.getChecked();
+                element.setChecked(isChecked);
+                MainActivity.EditTodoDatabaseEntry(element.getId(), isChecked);
+            }
+        });
+
+
+//        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                ListElement element = getItem(position);
+//                element.setChecked(isChecked);
+//            }
+//        });
+
 
         // Return the whole list item layout (containing 2 TextViews)
         // so that it can be shown in the ListView

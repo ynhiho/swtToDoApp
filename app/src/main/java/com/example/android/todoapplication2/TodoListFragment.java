@@ -42,7 +42,7 @@ public class TodoListFragment extends Fragment {
         todos.clear();
         //mListElementsAdapter.clear();
         for (Todo todo : newTodos) {
-            ListElement le = new ListElement(todo.Text);
+            ListElement le = new ListElement(todo.Id, todo.Text, todo.isChecked);
             todos.add(le);
 //            mListElementsAdapter.add(le);
             Log.i("MY", "TodoListFragment -> update: " + todo.Text);
